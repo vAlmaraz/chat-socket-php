@@ -1,0 +1,6 @@
+{
+    "require": {
+        "cboden/ratchet": "^0.3.6",
+        "predis/predis": "^1.1"
+    }
+}

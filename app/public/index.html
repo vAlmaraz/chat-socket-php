@@ -1,0 +1,99 @@
+<html>
+<head>
+	<style type="text/css">
+		textarea {
+			width: 500px;
+			height: 600px;
+		}
+	</style>
+</head>
+<body>
+<button onclick="connect()">Connect</button>
+<table>
+	<tr>
+		<td>
+			<label for="me">Me:</label>
+		</td>
+		<td>
+			<input type="text" name="me" id="me" value="1" />
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<label for="to">To:</label>
+		</td>
+		<td>
+			<input type="text" name="to" id="to" value="2" />
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<input type="text" name="message" id="message" onkeypress="return checkEnter(event)" />
+			<input type="button" value="Send" onclick="javascript:sendMessage()"/>
+		</td>
+	</tr>
+</table>
+<textarea id="console"></textarea>
+<script type="text/javascript">
+var conn;
+function connect() {
+	if (conn !== null && conn !== undefined) {
+		conn.close();
+	}
+	clear();
+	conn = new WebSocket('ws://chat.valmaraz.com');
+	conn.onopen = function(e) {
+		conn.send('{"id":"' + getMyId() + '","type":"start"}');
+		showLocal('Connection established!');
+	};
+
+	conn.onmessage = function(e) {
+		var response = JSON.parse(e.data);
+		if (response.status == 'ok') {
+			show(response.message);
+		} else {
+			show(response.error);
+		}
+	};
+}
+
+function checkEnter(e) {
+    if (e.keyCode == 13) {
+		sendMessage();
+        return false;
+    }
+}
+
+function sendMessage() {
+	var input = document.getElementById('message');
+	conn.send(input.value);
+	conn.send('{"id":"' + getMyId() + '","type":"message","to":"' + getDestinationId() + '","message":"' + input.value + '"}');
+	showLocal('');
+	showLocal(input.value);
+	input.value = '';
+}
+
+function getMyId() {
+	var inputMe = document.getElementById('me');
+	return inputMe.value;
+}
+
+function getDestinationId() {
+	var inputTo = document.getElementById('to');
+	return inputTo.value;
+}
+
+function clear() {
+	document.getElementById('console').value = '';
+}
+
+function show(message) {
+	document.getElementById('console').value += message + '\n';
+}
+
+function showLocal(message) {
+	show('>>  ' + message);
+}
+</script>
+</body>
+</html>
