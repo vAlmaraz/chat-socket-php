@@ -25,7 +25,7 @@ class Chat implements MessageComponentInterface {
 	 * $msg 
 	 * {
 	 *   "id": "1",
-	 *	 "type": "start | message",
+	 *   "type": "start | message",
 	 *   "to": "2",
 	 *   "message": "The message"
 	 * }
@@ -48,7 +48,7 @@ class Chat implements MessageComponentInterface {
 			case 'start':
 				echo sprintf('Saving id: %s' . "\n", $me);
 				$this->redis->set($from->resourceId . '_id', $me);
-				break;
+			break;
 			case 'message':
 				if (!isset($data['to']) || !isset($data['message'])) {
 					return;
@@ -74,47 +74,8 @@ class Chat implements MessageComponentInterface {
 						$client->send(json_encode($response));
 					}
 				}
-				break;
+			break;
 		}
-		
-		/*
-		$parts = explode(' ', $msg);
-		$command = strtolower(array_shift($parts));
-		$message = implode(' ', $parts);
-		switch ($command) {
-			default:
-			case '/hi':
-				$from->send('What do you need?' . PHP_EOL 
-					. '/name <<name>>: tell me your name' . PHP_EOL
-					. '/all <<message>>: tell everyone something' . PHP_EOL
-					. '/eat <<something>>: send you something to eat' . PHP_EOL
-					. '/bye: close');
-				break;
-			case '/name':
-				$this->redis->set($from->resourceId . '_name', $message);
-				$from->send('Hi ' . $message . '. I am ratchet. Nice to meet you!');
-				break;
-			case '/all':
-				$from->send('Sending message to everyone...');
-				foreach ($this->clients as $client) {
-					$client->send($message);
-				}
-				break;
-			case '/eat':
-				if (empty($message)) {
-					$from->send('What do you want to eat?');
-				} elseif (in_array($message, ['apple', 'biscuit'])) {
-					$from->send('I send you the ' . $message . '.');
-				} else {
-					$from->send('Sorry, I don\'t have ' . $message . '. I\'m going to the market to buy it.');
-				}
-				break;
-			case '/bye':
-				$name = $this->redis->get($from->resourceId . '_name');
-				$from->send('Bye ' . $name);
-				break;
-		}
-		*/
     }
 
     public function onClose(ConnectionInterface $conn) {
